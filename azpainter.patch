@@ -1,0 +1,105 @@
+diff --git Makefile Makefile
+index 44b1ccb..425c9f0 100644
+--- Makefile
++++ Makefile
+@@ -23,12 +23,13 @@ freetype_dir := /usr/include/freetype2
+ ###########################
+ 
+ TARGET := azpainter
++APP := $(shell sed -n '/^Name=/s///p' "files/azpainter.desktop").app
+ AXLIB  := azxclass/libazxc.a
+ 
+ CXX := g++ -pthread
+-CXXFLAGS := -Wall -O2
+-LFLAGS := -s
+-LINKS := -lX11 -lXext -lXft -lfontconfig -lfreetype -lz -ljpeg -lrt
++CXXFLAGS := -Wall -O2 -I/opt/X11/include -I/opt/X11/include/freetype2
++LFLAGS := -L/opt/X11/lib
++LINKS := -lX11 -lXext -lXft -lfontconfig -lfreetype -lz -ljpeg
+ MACRO := -D_AZPT_RESDIR="\"$(datadir)\""
+ MACRO_OPT :=
+ INCLUDE := -Iazxclass/include -I$(freetype_dir)
+@@ -97,13 +98,13 @@ install:
+ 	@$(INSTALL_DAT) $(DATAFILES) $(datadir)
+ 	cp -r ./files/brush $(datadir)
+ 	cp -r ./files/texture $(datadir)
+-	@install -Dv -m 644 ./files/azpainter.desktop $(menudir)/azpainter.desktop
+-	@install -Dv -m 644 ./files/azpainter.png $(icondir)/azpainter.png
+-	@echo "Updating GTK icon cache."
+-	-gtk-update-icon-cache -f -t $(prefix)/share/icons/hicolor
++	echo "do shell script \"\
++		export LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8;\
++		$(bindir)/$(TARGET) >/dev/null 2>&1\"" | osacompile -o $(APP)
++	makeicns -in files/azpainter.png -out $(APP)/Contents/Resources/applet.icns
++	cp -rf $(APP) /Applications/
+ 
+ uninstall:
+ 	-$(RM) $(bindir)/$(TARGET)
+ 	-rm -fr $(datadir)
+-	-$(RM) $(menudir)/azpainter.desktop
+-	-$(RM) $(icondir)/azpainter.png
++	-$(RM) /Applications/$(APP)
+diff --git azxclass/src/AXThread.cpp azxclass/src/AXThread.cpp
+index 20ebe21..f8c7cf4 100644
+--- azxclass/src/AXThread.cpp
++++ azxclass/src/AXThread.cpp
+@@ -170,7 +170,7 @@ void AXMutex::initRecursive()
+         m_pDat = new pthread_mutex_t;
+ 
+         ::pthread_mutexattr_init(&mutex);
+-        ::pthread_mutexattr_settype(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
++        ::pthread_mutexattr_settype(&mutex, PTHREAD_MUTEX_RECURSIVE);
+         ::pthread_mutex_init((pthread_mutex_t *)m_pDat, &mutex);
+         ::pthread_mutexattr_destroy(&mutex);    //※linuxでは何もしない
+     }
+diff --git azxclass/src/AXUtilTime.cpp azxclass/src/AXUtilTime.cpp
+index bfff98e..eeef74e 100644
+--- azxclass/src/AXUtilTime.cpp
++++ azxclass/src/AXUtilTime.cpp
+@@ -31,6 +31,17 @@
+     @{
+ */
+ 
++// http://stackoverflow.com/questions/5167269/clock-gettime-alternative-in-mac-os-x
++#include <sys/time.h>
++#define CLOCK_MONOTONIC 0
++int clock_gettime(int /*clk_id*/, struct timespec* t) {
++    struct timeval now;
++    int rv = gettimeofday(&now, NULL);
++    if (rv) return rv;
++    t->tv_sec  = now.tv_sec;
++    t->tv_nsec = now.tv_usec * 1000;
++    return 0;
++}
+ 
+ //! 時間取得
+ 
+diff --git azxclass/src/AXUtilX.cpp azxclass/src/AXUtilX.cpp
+index bd2b990..0307d90 100644
+--- azxclass/src/AXUtilX.cpp
++++ azxclass/src/AXUtilX.cpp
+@@ -22,6 +22,7 @@
+ #include "AXX11.h"
+ 
+ #include <string.h>
++#include <sys/time.h>
+ 
+ #include "AXDef.h"
+ #include "AXApp.h"
+diff --git src/CApp.cpp src/CApp.cpp
+index 7492550..8f5d547 100644
+--- src/CApp.cpp
++++ src/CApp.cpp
+@@ -24,6 +24,7 @@ $*/
+ #include "AXX11.h"
+ 
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ #include "CApp.h"
+ 
+@@ -408,4 +409,3 @@ void CApp::onInputEvent(AXWindow *pwin,LPVOID pEvent,BOOL bSkip)
+ 
+ #endif
+ }
+-
