@@ -1,7 +1,8 @@
 AzPainter for Mac
 ====
 
-Convert the AzPainter to run on Mac
+Convert the AzPainter to run on Mac  
+Original is [AzPainter for Linux](http://azsky2.html.xdomain.jp/linux/azpainter/index.html)
 
 ## Requirement
 * brew
