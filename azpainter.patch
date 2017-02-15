@@ -1,105 +1,210 @@
-diff --git Makefile Makefile
-index 44b1ccb..425c9f0 100644
---- Makefile
-+++ Makefile
-@@ -23,12 +23,13 @@ freetype_dir := /usr/include/freetype2
- ###########################
+diff --git desktop/Makefile.am desktop/Makefile.am
+index d865209..81f4114 100644
+--- desktop/Makefile.am
++++ desktop/Makefile.am
+@@ -7,12 +7,14 @@ icon_DATA = azpainter.png
+ svgdir = $(datadir)/icons/hicolor/scalable/apps
+ svg_DATA = azpainter.svg
  
- TARGET := azpainter
-+APP := $(shell sed -n '/^Name=/s///p' "files/azpainter.desktop").app
- AXLIB  := azxclass/libazxc.a
++appname = $(shell sed -n '/^Name=/s///p' azpainter.desktop).app
++
+ EXTRA_DIST = azpainter.desktop azpainter.png azpainter.svg
  
- CXX := g++ -pthread
--CXXFLAGS := -Wall -O2
--LFLAGS := -s
--LINKS := -lX11 -lXext -lXft -lfontconfig -lfreetype -lz -ljpeg -lrt
-+CXXFLAGS := -Wall -O2 -I/opt/X11/include -I/opt/X11/include/freetype2
-+LFLAGS := -L/opt/X11/lib
-+LINKS := -lX11 -lXext -lXft -lfontconfig -lfreetype -lz -ljpeg
- MACRO := -D_AZPT_RESDIR="\"$(datadir)\""
- MACRO_OPT :=
- INCLUDE := -Iazxclass/include -I$(freetype_dir)
-@@ -97,13 +98,13 @@ install:
- 	@$(INSTALL_DAT) $(DATAFILES) $(datadir)
- 	cp -r ./files/brush $(datadir)
- 	cp -r ./files/texture $(datadir)
--	@install -Dv -m 644 ./files/azpainter.desktop $(menudir)/azpainter.desktop
--	@install -Dv -m 644 ./files/azpainter.png $(icondir)/azpainter.png
--	@echo "Updating GTK icon cache."
--	-gtk-update-icon-cache -f -t $(prefix)/share/icons/hicolor
+ gtk_update_icon_cache = gtk-update-icon-cache -f -t $(datadir)/icons/hicolor
+ 
+-install-data-hook: update-icon-cache
+-uninstall-hook: update-icon-cache
++install-data-hook: update-icon-cache install-for-mac
++uninstall-hook: update-icon-cache uninstall-for-mac
+ 
+ update-icon-cache:
+ 	@-if test -z "$(DESTDIR)"; then \
+@@ -22,3 +24,13 @@ update-icon-cache:
+ 		echo "*** Icon cache not updated. After (un)install, run this:"; \
+ 		echo "*** $(gtk_update_icon_cache)"; \
+ 	fi
++
++install-for-mac:
 +	echo "do shell script \"\
-+		export LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8;\
-+		$(bindir)/$(TARGET) >/dev/null 2>&1\"" | osacompile -o $(APP)
-+	makeicns -in files/azpainter.png -out $(APP)/Contents/Resources/applet.icns
-+	cp -rf $(APP) /Applications/
++		LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8\
++        $(DESTDIR)$(bindir)/$(PACKAGE) >/dev/null 2>&1 &\"" | osacompile -o $(appname)
++	makeicns -in azpainter.png -out $(appname)/Contents/Resources/applet.icns
++	cp -rf $(appname) /Applications/
++
++uninstall-for-mac:
++	rm -rf /Applications/$(appname)
+diff --git desktop/Makefile.in desktop/Makefile.in
+index 7c74245..77eabe0 100644
+--- desktop/Makefile.in
++++ desktop/Makefile.in
+@@ -244,6 +244,7 @@ icondir = $(datadir)/icons/hicolor/48x48/apps
+ icon_DATA = azpainter.png
+ svgdir = $(datadir)/icons/hicolor/scalable/apps
+ svg_DATA = azpainter.svg
++appname = $(shell sed -n '/^Name=/s///p' azpainter.desktop).app
+ EXTRA_DIST = azpainter.desktop azpainter.png azpainter.svg
+ gtk_update_icon_cache = gtk-update-icon-cache -f -t $(datadir)/icons/hicolor
+ all: all-am
+@@ -503,8 +504,8 @@ uninstall-am: uninstall-desktopDATA uninstall-iconDATA \
+ .PRECIOUS: Makefile
  
- uninstall:
- 	-$(RM) $(bindir)/$(TARGET)
- 	-rm -fr $(datadir)
--	-$(RM) $(menudir)/azpainter.desktop
--	-$(RM) $(icondir)/azpainter.png
-+	-$(RM) /Applications/$(APP)
-diff --git azxclass/src/AXThread.cpp azxclass/src/AXThread.cpp
-index 20ebe21..f8c7cf4 100644
---- azxclass/src/AXThread.cpp
-+++ azxclass/src/AXThread.cpp
-@@ -170,7 +170,7 @@ void AXMutex::initRecursive()
-         m_pDat = new pthread_mutex_t;
  
-         ::pthread_mutexattr_init(&mutex);
--        ::pthread_mutexattr_settype(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
-+        ::pthread_mutexattr_settype(&mutex, PTHREAD_MUTEX_RECURSIVE);
-         ::pthread_mutex_init((pthread_mutex_t *)m_pDat, &mutex);
-         ::pthread_mutexattr_destroy(&mutex);    //※linuxでは何もしない
-     }
-diff --git azxclass/src/AXUtilTime.cpp azxclass/src/AXUtilTime.cpp
-index bfff98e..eeef74e 100644
---- azxclass/src/AXUtilTime.cpp
-+++ azxclass/src/AXUtilTime.cpp
-@@ -31,6 +31,17 @@
-     @{
- */
+-install-data-hook: update-icon-cache
+-uninstall-hook: update-icon-cache
++install-data-hook: update-icon-cache install-for-mac
++uninstall-hook: update-icon-cache uninstall-for-mac
  
-+// http://stackoverflow.com/questions/5167269/clock-gettime-alternative-in-mac-os-x
-+#include <sys/time.h>
-+#define CLOCK_MONOTONIC 0
-+int clock_gettime(int /*clk_id*/, struct timespec* t) {
-+    struct timeval now;
-+    int rv = gettimeofday(&now, NULL);
-+    if (rv) return rv;
-+    t->tv_sec  = now.tv_sec;
-+    t->tv_nsec = now.tv_usec * 1000;
-+    return 0;
-+}
+ update-icon-cache:
+ 	@-if test -z "$(DESTDIR)"; then \
+@@ -515,6 +516,16 @@ update-icon-cache:
+ 		echo "*** $(gtk_update_icon_cache)"; \
+ 	fi
  
- //! 時間取得
++install-for-mac:
++	echo "do shell script \"\
++		LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8\
++        $(DESTDIR)$(bindir)/$(PACKAGE) >/dev/null 2>&1 &\"" | osacompile -o $(appname)
++	makeicns -in azpainter.png -out $(appname)/Contents/Resources/applet.icns
++	cp -rf $(appname) /Applications/
++
++uninstall-for-mac:
++	rm -rf /Applications/$(appname)
++
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+ .NOEXPORT:
+diff --git mlib/include/mSysX11.h mlib/include/mSysX11.h
+index 53a7672..67597ca 100644
+--- mlib/include/mSysX11.h
++++ mlib/include/mSysX11.h
+@@ -150,7 +150,8 @@ struct _mAppSystem
  
-diff --git azxclass/src/AXUtilX.cpp azxclass/src/AXUtilX.cpp
-index bd2b990..0307d90 100644
---- azxclass/src/AXUtilX.cpp
-+++ azxclass/src/AXUtilX.cpp
-@@ -22,6 +22,7 @@
- #include "AXX11.h"
+ #if !defined(MLIB_NO_THREAD)
+ 	mMutex mutex;
+-	int fd_event;
++	int fd_event0;
++	int fd_event1;
+ #endif
  
- #include <string.h>
-+#include <sys/time.h>
+ 	Atom atoms[MX11_ATOM_NUM];
+diff --git mlib/src/widget/mWindow.c mlib/src/widget/mWindow.c
+index 0cacf19..4b3b7c2 100644
+--- mlib/src/widget/mWindow.c
++++ mlib/src/widget/mWindow.c
+@@ -303,7 +303,7 @@ void mWindowMoveCenter(mWindow *p,mWindow *win)
+ 	if(x < box.x) x = box.x;
+ 	if(y < box.y) y = box.y;
  
- #include "AXDef.h"
- #include "AXApp.h"
-diff --git src/CApp.cpp src/CApp.cpp
-index 7492550..8f5d547 100644
---- src/CApp.cpp
-+++ src/CApp.cpp
-@@ -24,6 +24,7 @@ $*/
- #include "AXX11.h"
+-	mWidgetMove(M_WIDGET(p), x, y);
++	mWidgetMove(M_WIDGET(p), 0, 0);
+ }
  
- #include <stdlib.h>
-+#include <unistd.h>
+ /** 初期表示処理
+diff --git mlib/src/x11/x11_main.c mlib/src/x11/x11_main.c
+index 295ad25..22bc5ae 100644
+--- mlib/src/x11/x11_main.c
++++ mlib/src/x11/x11_main.c
+@@ -36,7 +36,7 @@ $*/
  
- #include "CApp.h"
+ #include <stdio.h>
+ #include <sys/select.h>
+-#include <sys/eventfd.h>
++//#include <sys/eventfd.h>
+ #include <unistd.h>
  
-@@ -408,4 +409,3 @@ void CApp::onInputEvent(AXWindow *pwin,LPVOID pEvent,BOOL bSkip)
+ #include <ft2build.h>
+@@ -199,10 +199,19 @@ static void _app_init_thread(mAppSystem *p)
+ 
+ #else
+ 
+-	p->fd_event = eventfd(0, 0);
+-	if(p->fd_event == -1) p->fd_event = 0;
++	int pfd[2];
++	if(pipe(pfd) == -1)
++	{
++		p->fd_event0 = 0;
++		p->fd_event1 = 0;
++	}
++	else
++	{
++		p->fd_event0 = pfd[0];
++		p->fd_event1 = pfd[1];
++	}
+ 
+-	p->select_fdnum = 1 + ((p->connection < p->fd_event)? p->fd_event: p->connection);
++	p->select_fdnum = 1 + ((p->connection < p->fd_event1)? p->fd_event1: p->connection);
+ 
+ 	p->mutex = mMutexNew();
+ 	mMutexLock(p->mutex);
+@@ -228,8 +237,10 @@ void __mAppEnd(void)
+ 
+ #if !defined(MLIB_NO_THREAD)
+ 
+-	if(p->fd_event)
+-		close(p->fd_event);
++	if(p->fd_event0)
++		close(p->fd_event0);
++	if(p->fd_event1)
++		close(p->fd_event1);
+ 
+ 	if(p->mutex)
+ 	{
+@@ -435,8 +446,8 @@ void mAppWakeUpEvent()
+ 
+ 	int64_t num = 1;
+ 
+-	if(MAPP_SYS->fd_event)
+-		write(MAPP_SYS->fd_event, &num, 8);
++	if(MAPP_SYS->fd_event1)
++		write(MAPP_SYS->fd_event1, &num, 8);
  
  #endif
  }
--
+@@ -492,7 +503,7 @@ static int _wait_event(void)
+ 	FD_SET(p->connection, &fd);
+ 
+ #if !defined(MLIB_NO_THREAD)
+-	if(p->fd_event) FD_SET(p->fd_event, &fd);
++	if(p->fd_event0) FD_SET(p->fd_event0, &fd);
+ #endif
+ 
+ 	//タイマーの最小時間
+@@ -526,10 +537,10 @@ static int _wait_event(void)
+ 	else if(FD_ISSET(p->connection, &fd))
+ 		return 1;
+ #if !defined(MLIB_NO_THREAD)
+-	else if(p->fd_event && FD_ISSET(p->fd_event, &fd))
++	else if(p->fd_event0 && FD_ISSET(p->fd_event0, &fd))
+ 	{
+ 		int64_t eft;
+-		read(p->fd_event, &eft, 8);
++		read(p->fd_event0, &eft, 8);
+ 	}
+ #endif
+ 
+diff --git src/Makefile.am src/Makefile.am
+index a203c43..e5c46cc 100644
+--- src/Makefile.am
++++ src/Makefile.am
+@@ -3,7 +3,7 @@ AM_CFLAGS=-pthread
+ 
+ bin_PROGRAMS=azpainter
+ azpainter_LDADD=../mlib/libmlib.a \
+-  -lX11 -lXext -lfontconfig -lfreetype -lpng -ljpeg -lz -lrt -lm
++  -lX11 -lXext -lfontconfig -lfreetype -lpng -lturbojpeg -lz -lm
+ 
+ azpainter_SOURCES= \
+ AppCursor.c \
+diff --git src/Makefile.in src/Makefile.in
+index c9c3bd4..06c3a48 100644
+--- src/Makefile.in
++++ src/Makefile.in
+@@ -345,7 +345,7 @@ top_srcdir = @top_srcdir@
+ AM_CPPFLAGS = -I../mlib/include -Iinclude -I@freetype_dir@ -DPACKAGE_DATA_DIR=\""$(datadir)/azpainter"\"
+ AM_CFLAGS = -pthread
+ azpainter_LDADD = ../mlib/libmlib.a \
+-  -lX11 -lXext -lfontconfig -lfreetype -lpng -ljpeg -lz -lrt -lm
++  -lX11 -lXext -lfontconfig -lfreetype -lpng -lturbojpeg -lz -lm
+ 
+ azpainter_SOURCES = \
+ AppCursor.c \

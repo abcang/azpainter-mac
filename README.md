@@ -12,7 +12,7 @@ Original is [AzPainter for Linux](http://azsky2.html.xdomain.jp/linux/azpainter/
 It will be installed in the `/Applications`
 
 ```zsh
-$ brew install jpeg makeicns
+$ brew install jpeg-turbo makeicns
 $ make
 $ make install
 ```
