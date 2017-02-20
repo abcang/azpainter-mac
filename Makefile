@@ -1,11 +1,11 @@
 TARGET=azpainter
 APP=$(TARGET).app
-VERSION=2.0.1
+VERSION=2.0.2
 PATCH=$(TARGET).patch
 SRCDIR=$(TARGET)-$(VERSION)
 SRCOBJ=$(SRCDIR)/src/$(TARGET)
 DLFILE=$(SRCDIR).tar.bz2
-URL="https://osdn.net/frs/redir.php?m=jaist&f=%2Fazpainter%2F67071%2Fazpainter-2.0.1.tar.bz2"
+URL="https://osdn.net/frs/redir.php?m=iij&f=%2Fazpainter%2F67130%2Fazpainter-2.0.2.tar.bz2"
 
 x11_lib_dir=$(shell dirname $(shell locate libX11.dylib))
 x11_include_dir=$(shell dirname $(x11_lib_dir))/include
