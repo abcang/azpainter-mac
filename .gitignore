@@ -87,5 +87,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-azpainter-*
-azpainter.app
+/azpainter-*
+/azpainter.app
+/azpainter_mtr/*
+/azpainter_mtr_*.zip
+
