@@ -1,17 +1,18 @@
 TARGET=azpainter
 APP=$(TARGET).app
-VERSION=2.0.4
+VERSION=2.0.6
 PATCH=$(TARGET).patch
 SRCDIR=$(TARGET)-$(VERSION)
 SRCOBJ=$(SRCDIR)/src/$(TARGET)
 DLFILE=$(SRCDIR).tar.bz2
-URL="https://osdn.net/frs/redir.php?m=iij&f=%2Fazpainter%2F67264%2Fazpainter-2.0.4.tar.bz2"
+URL="https://osdn.net/frs/redir.php?m=iij&f=%2Fazpainter%2F67805%2Fazpainter-2.0.6.tar.bz2"
 LOCALE_DIR=azpainter_mtr
-LOCALE_FILE=$(LOCALE_DIR)_20170319.zip
-LOCALE_FILE_URL="http://hnng.moe/f/Ooq"
+LOCALE_FILE=$(LOCALE_DIR)_20170603.zip
+LOCALE_FILE_URL="http://hnng.moe/f/ReA"
 
-x11_lib_dir=$(shell dirname $(shell locate libX11.dylib))
-x11_include_dir=$(shell dirname $(x11_lib_dir))/include
+x11_dir=/usr/X11
+x11_lib_dir=$(x11_dir)/lib
+x11_include_dir=$(x11_dir)/include
 freetype_include_dir=$(x11_include_dir)/freetype2
 turbojpeg_dir=$(shell brew --prefix jpeg-turbo)
 turbojpeg_include_dir=$(turbojpeg_dir)/include

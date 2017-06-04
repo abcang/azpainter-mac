@@ -71,19 +71,6 @@ index 09fbdeb..8e3d7ec 100644
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
  .NOEXPORT:
-diff --git mlib/src/widget/mWindow.c mlib/src/widget/mWindow.c
-index 0cacf19..4e62ee0 100644
---- mlib/src/widget/mWindow.c
-+++ mlib/src/widget/mWindow.c
-@@ -303,7 +303,7 @@ void mWindowMoveCenter(mWindow *p,mWindow *win)
- 	if(x < box.x) x = box.x;
- 	if(y < box.y) y = box.y;
- 
--	mWidgetMove(M_WIDGET(p), x, y);
-+	mWidgetMove(M_WIDGET(p), 0, y);
- }
- 
- /** 初期表示処理
 diff --git src/Makefile.am src/Makefile.am
 index a203c43..e5c46cc 100644
 --- src/Makefile.am
