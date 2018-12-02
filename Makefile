@@ -1,11 +1,11 @@
 TARGET=azpainter
 APP=$(TARGET).app
-VERSION=2.1.2
+VERSION=2.1.3
 PATCH=$(TARGET).patch
 SRCDIR=$(TARGET)-$(VERSION)
 SRCOBJ=$(SRCDIR)/src/$(TARGET)
 DLFILE=$(SRCDIR).tar.gz
-URL="https://github.com/Symbian9/azpainter/archive/v2.1.2.tar.gz"
+URL="https://github.com/Symbian9/azpainter/archive/v2.1.3.tar.gz"
 
 x11_dir=/usr/X11
 x11_lib_dir=$(x11_dir)/lib
