@@ -30,6 +30,5 @@ make install
 ## LICENSE
 [MIT](https://github.com/abcang/azpainter-mac/blob/master/LICENSE)
 
-## Author
 
-[ABCanG](https://github.com/abcang)
+[abcang](https://github.com/abcang)
