@@ -1,5 +1,6 @@
 AzPainter for Mac
 ====
+[![Build Status](https://travis-ci.com/abcang/azpainter-mac.svg?branch=master)](https://travis-ci.com/abcang/azpainter-mac)
 
 Convert the AzPainter to run on Mac  
 Original is [AzPainter for Linux](http://azsky2.html.xdomain.jp/linux/azpainter.html)  
