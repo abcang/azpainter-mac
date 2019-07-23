@@ -18,7 +18,7 @@ install:
 script:
   - make
   - make install
-  - /Application/AzPainter.app
+  - /Applications/AzPainter.app
   - sleep 10
   - pgrep azpainter
   - pkill azpainter
