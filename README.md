@@ -18,6 +18,8 @@ brew install azpainter
 ln -sf $(brew --prefix azpainter)/AzPainter.app /Applications/
 ```
 
+repository: https://github.com/abcang/homebrew-azpainter
+
 ## Install without using brew tap
 It will be installed in the `/Applications`
 
