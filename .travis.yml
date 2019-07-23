@@ -1,0 +1,24 @@
+language: ruby
+matrix:
+  include:
+    # See https://docs.travis-ci.com/user/reference/osx/
+    - os: osx
+      osx_image: xcode11
+      # macOS 10.14
+    # - os: osx
+    #   osx_image: xcode10
+    #   # macOS 10.13
+    # - os: osx
+    #   osx_image: xcode9
+    #   # macOS 10.12
+install:
+  - brew update
+  - brew cask install xquartz
+  - brew install jpeg-turbo makeicns
+script:
+  - make
+  - make install
+  - /Application/AzPainter.app
+  - sleep 10
+  - pgrep azpainter
+  - pkill azpainter
