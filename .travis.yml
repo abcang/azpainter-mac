@@ -1,4 +1,7 @@
 language: ruby
+branches:
+  only:
+    - master
 matrix:
   include:
     # See https://docs.travis-ci.com/user/reference/osx/
