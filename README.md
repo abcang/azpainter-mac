@@ -27,8 +27,8 @@ make install
 ```
 
 ## LICENSE
-[MIT](https://github.com/ABCanG/azpainter-mac/blob/master/LICENSE)
+[MIT](https://github.com/abcang/azpainter-mac/blob/master/LICENSE)
 
 ## Author
 
-[ABCanG](https://github.com/ABCanG)
+[ABCanG](https://github.com/abcang)
