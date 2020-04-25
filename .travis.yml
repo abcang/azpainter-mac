@@ -14,7 +14,7 @@ matrix:
 install:
   - brew update
   - brew cask install xquartz
-  - brew install jpeg-turbo makeicns
+  - brew install svg2png makeicns
 script:
   - make
   - make install

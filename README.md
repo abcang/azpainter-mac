@@ -25,7 +25,7 @@ It will be installed in the `/Applications`
 
 ```bash
 brew cask install xquartz
-brew install jpeg-turbo makeicns
+brew install svg2png makeicns
 make
 make install
 ```

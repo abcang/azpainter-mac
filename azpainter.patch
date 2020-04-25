@@ -1,99 +1,37 @@
-diff --git desktop/Makefile.am desktop/Makefile.am
-index bc13f46..4fcce4b 100644
---- desktop/Makefile.am
-+++ desktop/Makefile.am
-@@ -13,10 +13,12 @@ svg_DATA = azpainter.svg application-x-azpainter-apd.svg
- mimetypedir = $(datadir)/mime/packages
- mimetype_DATA = azpainter.xml
+diff --git configure configure
+index cb9a9f6..565c280 100755
+--- configure
++++ configure
+@@ -226,8 +226,8 @@ tmp1=`uname`
+ if test "$tmp1" = Linux;then cf_os=linux
+ elif test "$tmp1" = Darwin;then
+ 	cf_os=mac
+-	CFLAGS=`fc_add_string "$CFLAGS" "-I/usr/X11/include"`
+-	LDFLAGS=`fc_add_string "$LDFLAGS" "-L/usr/X11/lib"`
++	CFLAGS=`fc_add_string "$CFLAGS" "-I/opt/X11/include"`
++	LDFLAGS=`fc_add_string "$LDFLAGS" "-L/opt/X11/lib"`
+ elif test "$tmp1" = FreeBSD;then
+ 	cf_os=freebsd
+ 	cf_make=gmake
+@@ -311,7 +311,7 @@ fc_check_lib libjpeg "libjpeg" "" "-ljpeg" "stdio.h jpeglib.h" "libjpeg-dev or l
+ fc_check_lib X11 "x11" "" "-lX11" "X11/Xlib.h" "libx11-dev or libX11-devel or libx11"
+ fc_check_lib Xext "xext" "" "-lXext" "X11/Xlib.h X11/extensions/XShm.h" "libxext-dev or libXext-devel or libxext"
+ fc_check_lib XInput "xi" "" "-lXi" "X11/Xlib.h X11/extensions/XInput2.h" "libxi-dev or libXi-devel or libxi"
+-fc_check_lib fontconfig "fontconfig" "-I/usr/include/freetype2 -I/usr/X11/include/freetype2 -I/usr/local/include/freetype2" "-lfontconfig -lfreetype" "fontconfig/fontconfig.h" "libfontconfig1-dev or libfontconfig-devel or fontconfig"
++fc_check_lib fontconfig "fontconfig" "-I/usr/include/freetype2 -I/opt/X11/include/freetype2 -I/usr/local/include/freetype2" "-lfontconfig -lfreetype" "fontconfig/fontconfig.h" "libfontconfig1-dev or libfontconfig-devel or fontconfig"
+ fc_check_lib freetype2 "freetype2" "" "" "ft2build.h" "libfreetype6-dev or libfreetype6-devel or freetype2"
  
-+appname = $(shell sed -n '/^Name=/s///p' azpainter.desktop).app
-+
- ### rule
- 
--install-data-hook: update-cache
--uninstall-hook: update-cache
-+install-data-hook: update-cache install-for-mac
-+uninstall-hook: update-cache uninstall-for-mac
- 
- update-cache:
- 	@-if test -z "$(DESTDIR)"; then \
-@@ -25,3 +27,13 @@ update-cache:
- 		update-mime-database $(datadir)/mime; \
- 		update-desktop-database $(datadir)/applications; \
- 	fi
-+
-+install-for-mac:
-+	echo "do shell script \"\
-+		LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8\
-+		$(DESTDIR)$(bindir)/$(PACKAGE) >/dev/null 2>&1 &\"" | osacompile -o $(appname)
-+	makeicns -in azpainter.png -out $(appname)/Contents/Resources/applet.icns
-+	cp -rf $(appname) /Applications/
-+
-+uninstall-for-mac:
-+	rm -rf /Applications/$(appname)
-diff --git desktop/Makefile.in desktop/Makefile.in
-index 09fbdeb..8e3d7ec 100644
---- desktop/Makefile.in
-+++ desktop/Makefile.in
-@@ -249,6 +249,7 @@ svgdir = $(datadir)/icons/hicolor/scalable/apps
- svg_DATA = azpainter.svg application-x-azpainter-apd.svg
- mimetypedir = $(datadir)/mime/packages
- mimetype_DATA = azpainter.xml
-+appname = $(shell sed -n '/^Name=/s///p' azpainter.desktop).app
- all: all-am
- 
- .SUFFIXES:
-@@ -530,8 +531,8 @@ uninstall-am: uninstall-desktopDATA uninstall-iconDATA \
- 
- ### rule
- 
--install-data-hook: update-cache
--uninstall-hook: update-cache
-+install-data-hook: update-cache install-for-mac
-+uninstall-hook: update-cache uninstall-for-mac
- 
- update-cache:
- 	@-if test -z "$(DESTDIR)"; then \
-@@ -541,6 +542,16 @@ update-cache:
- 		update-desktop-database $(datadir)/applications; \
- 	fi
- 
-+install-for-mac:
-+	echo "do shell script \"\
-+		LANG=$(shell defaults read -g AppleLocale | sed 's/@.*$$//g').UTF-8\
-+		$(DESTDIR)$(bindir)/$(PACKAGE) >/dev/null 2>&1 &\"" | osacompile -o $(appname)
-+	makeicns -in azpainter.png -out $(appname)/Contents/Resources/applet.icns
-+	cp -rf $(appname) /Applications/
-+
-+uninstall-for-mac:
-+	rm -rf /Applications/$(appname)
-+
- # Tell versions [3.59,3.63) of GNU make to not export all variables.
- # Otherwise a system limit (for SysV at least) may be exceeded.
- .NOEXPORT:
-diff --git src/Makefile.am src/Makefile.am
-index a203c43..e5c46cc 100644
---- src/Makefile.am
-+++ src/Makefile.am
-@@ -3,7 +3,7 @@ AM_CFLAGS=-pthread
- 
- bin_PROGRAMS=azpainter
- azpainter_LDADD=../mlib/libmlib.a \
--  -lX11 -lXext -lfontconfig -lfreetype -lpng -ljpeg -lz -lrt -lm
-+  -lX11 -lXext -lfontconfig -lfreetype -lpng -lturbojpeg -lz -lm
- 
- azpainter_SOURCES= \
- AppCursor.c \
-diff --git src/Makefile.in src/Makefile.in
-index c9c3bd4..c45d421 100644
---- src/Makefile.in
-+++ src/Makefile.in
-@@ -345,7 +345,7 @@ top_srcdir = @top_srcdir@
- AM_CPPFLAGS = -I../mlib/include -Iinclude -I@freetype_dir@ -DPACKAGE_DATA_DIR=\""$(datadir)/azpainter"\"
- AM_CFLAGS = -pthread
- azpainter_LDADD = ../mlib/libmlib.a \
--  -lX11 -lXext -lfontconfig -lfreetype -lpng -ljpeg -lz -lrt -lm
-+  -lX11 -lXext -lfontconfig -lfreetype -lpng -lturbojpeg -lz -lm
- 
- azpainter_SOURCES = \
- AppCursor.c \
+ #------------------
+diff --git desktop/icons/hicolor/scalable/apps/azpainter.svg desktop/icons/hicolor/scalable/apps/azpainter.svg
+index 023e08a..d2dc659 100755
+--- desktop/icons/hicolor/scalable/apps/azpainter.svg
++++ desktop/icons/hicolor/scalable/apps/azpainter.svg
+@@ -167,7 +167,7 @@
+        x="20.971798"
+        y="560.68152"
+        sodipodi:insensitive="true"
+-       ry="44.807964"
++       ry="0"
+        rx="0" />
+     <g
+        id="g4320"
