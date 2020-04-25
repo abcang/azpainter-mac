@@ -25,7 +25,7 @@ $(SRCOBJ): $(PATCH) $(DLFILE)
 	mkdir -p $(SRCDIR)
 	tar xf $(DLFILE)
 	cd $(SRCDIR) && chmod +x ./configure
-	cd $(SRCDIR) && patch -p0 -r ./ < ../$(PATCH)
+	cd $(SRCDIR) && patch -p0 -t -r ./ < ../$(PATCH)
 	cd $(SRCDIR) && ./configure --with-freetype-dir=$(freetype_include_dir) CPPFLAGS="-I$(turbojpeg_include_dir) -I$(x11_include_dir)" LDFLAGS="-L$(x11_lib_dir) -L$(turbojpeg_lib_dir)"
 	$(MAKE) -j$(shell sysctl -n hw.ncpu) -C $(SRCDIR)
 
