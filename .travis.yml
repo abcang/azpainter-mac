@@ -6,11 +6,11 @@ matrix:
   include:
     # See https://docs.travis-ci.com/user/reference/osx/
     - os: osx
+      osx_image: xcode12
+      # macOS 10.15
+    - os: osx
       osx_image: xcode11
       # macOS 10.14
-    - os: osx
-      osx_image: xcode10
-      # macOS 10.13
 install:
   - brew update
   - brew cask install xquartz
