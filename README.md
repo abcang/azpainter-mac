@@ -12,7 +12,7 @@ This repository uses https://github.com/Symbian9/azpainter
 
 ## Install using brew tap
 ```bash
-brew cask install xquartz
+brew install xquartz
 brew tap abcang/azpainter
 brew install azpainter
 ln -sf $(brew --prefix azpainter)/AzPainter.app /Applications/
@@ -24,8 +24,8 @@ repository: https://github.com/abcang/homebrew-azpainter
 It will be installed in the `/Applications`
 
 ```bash
-brew cask install xquartz
-brew install svg2png makeicns
+brew install xquartz
+brew install svg2png
 make
 make install
 ```

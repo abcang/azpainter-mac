@@ -13,8 +13,8 @@ matrix:
       # macOS 10.14
 install:
   - brew update
-  - brew cask install xquartz
-  - brew install svg2png makeicns
+  - brew install xquartz
+  - brew install svg2png
 script:
   - make
   - make install
