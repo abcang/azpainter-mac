@@ -2,6 +2,9 @@ language: ruby
 branches:
   only:
     - master
+env:
+  global:
+    - HOMEBREW_NO_AUTO_UPDATE=1
 matrix:
   include:
     # See https://docs.travis-ci.com/user/reference/osx/
