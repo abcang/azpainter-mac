@@ -2,6 +2,9 @@ language: ruby
 branches:
   only:
     - master
+env:
+  global:
+    - HOMEBREW_NO_AUTO_UPDATE=1
 matrix:
   include:
     # See https://docs.travis-ci.com/user/reference/osx/
@@ -13,8 +16,8 @@ matrix:
       # macOS 10.14
 install:
   - brew update
-  - brew cask install xquartz
-  - brew install svg2png makeicns
+  - brew install xquartz
+  - brew install svg2png
 script:
   - make
   - make install
