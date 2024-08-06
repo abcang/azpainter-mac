@@ -1,10 +1,9 @@
 AzPainter for Mac
 ====
-[![Build Status](https://travis-ci.com/abcang/azpainter-mac.svg?branch=master)](https://travis-ci.com/abcang/azpainter-mac)
 
-Convert the AzPainter to run on Mac  
-Original is [AzPainter for Linux](http://azsky2.html.xdomain.jp/linux/azpainter.html)  
-This repository uses https://github.com/Symbian9/azpainter
+Original repository: [https://gitlab.com/azelpg/azpainter](https://gitlab.com/azelpg/azpainter)  
+Install with homebrew: [https://github.com/abcang/homebrew-azpainter](https://github.com/abcang/homebrew-azpainter)
+
 
 ## Requirement
 * brew
